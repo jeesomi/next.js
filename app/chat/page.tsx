@@ -1,8 +1,12 @@
 "use client";
-
+import MessageBubble from "../components/MessageBubble";
 import { useState } from "react";
 
 const members = [
+    {
+        name: "Team Chat",
+        type: "group",
+    },
     {
         name: "Amir",
         type: "user",
@@ -19,37 +23,102 @@ const members = [
         name: "Mohammad",
         type: "user",
     },
-    {
-        name: "Team Chat",
-        type: "group",
-    },
 ];
 
 const chats: any = {
     Amir: [
-        "سلام تیم 👋",
-        "پروژه چطور پیش رفت؟",
-        "فایل جدید را بررسی کردی؟",
+        {
+            sender: "Amir",
+            text: "سلام تیم 👋",
+            time: "10:00",
+        },
+        {
+            sender: "Amir",
+            text: "پروژه چطور پیش رفت؟",
+            time: "10:05",
+        },
+        {
+            sender: "Amir",
+            text: "فایل جدید را بررسی کردی؟",
+            time: "10:10",
+        },
     ],
 
     Hossein: [
-        "سلام حسین",
-        "جلسه فردا چه ساعتی است؟",
+        {
+            sender: "Hossein",
+            text: "سلام 👋",
+            time: "10:15",
+        },
+        {
+            sender: "Hossein",
+            text: "جلسه فردا چه ساعتی است؟",
+            time: "10:20",
+        },
+        {
+            sender: "Hossein",
+            text: "من بخش خودم را آماده کردم.",
+            time: "10:25",
+        },
     ],
 
     Somayeh: [
-        "سلام 👋",
-        "دارم روی Next.js کار می‌کنم 🚀",
+        {
+            sender: "Somayeh",
+            text: "سلام 👋",
+            time: "10:30",
+        },
+        {
+            sender: "Somayeh",
+            text: "دارم روی Next.js کار می‌کنم 🚀",
+            time: "10:35",
+        },
+        {
+            sender: "Somayeh",
+            text: "بخش چت اولیه آماده شد.",
+            time: "10:40",
+        },
     ],
 
     Mohammad: [
-        "سلام محمد",
-        "وضعیت تسک‌ها چطوره؟",
+        {
+            sender: "Mohammad",
+            text: "سلام 👋",
+            time: "10:45",
+        },
+        {
+            sender: "Mohammad",
+            text: "وضعیت تسک‌ها چطوره؟",
+            time: "10:50",
+        },
+        {
+            sender: "Mohammad",
+            text: "من گزارش را بررسی می‌کنم.",
+            time: "10:55",
+        },
     ],
 
     "Team Chat": [
-        "سلام همه 👋",
-        "جلسه را شروع کنیم",
+        {
+            sender: "Amir",
+            text: "سلام همه 👋",
+            time: "09:30",
+        },
+        {
+            sender: "Somayeh",
+            text: "جلسه را شروع کنیم 🚀",
+            time: "09:32",
+        },
+        {
+            sender: "Hossein",
+            text: "من آماده‌ام.",
+            time: "09:35",
+        },
+        {
+            sender: "Mohammad",
+            text: "من هم آنلاین هستم.",
+            time: "09:36",
+        },
     ],
 };
 
@@ -57,9 +126,30 @@ const chats: any = {
 export default function ChatPage() {
 
     const [selectedMember, setSelectedMember] = useState("Team Chat");
+    const [allChats, setAllChats] = useState(chats);
+    const [newMessage, setNewMessage] = useState("");
+    const messages = allChats[selectedMember];
 
-    const messages = chats[selectedMember];
 
+    const currentUser = "Somayeh";
+    function sendMessage() {
+
+        if (newMessage.trim() === "") return;
+
+        setAllChats({
+            ...allChats,
+            [selectedMember]: [
+                ...allChats[selectedMember],
+                {
+                    sender: currentUser,
+                    text: newMessage,
+                    time: new Date().toLocaleTimeString(),
+                },
+            ],
+        });
+
+        setNewMessage("");
+    }
     return (
         <main className="h-screen flex">
 
@@ -107,15 +197,14 @@ export default function ChatPage() {
                 {/* Messages */}
                 <div className="flex-1 p-6 space-y-4 overflow-y-auto">
 
-                    {messages.map((message: string, index: number) => (
+                    {messages.map((message: any, index: number) => (
 
-                        <div
+                        <MessageBubble
                             key={index}
-                            className="bg-zinc-200 text-black p-3 rounded-lg w-fit"
-                        >
-                            {message}
-                        </div>
-
+                            sender={message.sender}
+                            text={message.text}
+                            time={message.time}
+                        />
                     ))}
 
                 </div>
@@ -128,10 +217,20 @@ export default function ChatPage() {
                     <input
                         className="flex-1 border rounded-lg px-4"
                         placeholder="Write a message..."
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                sendMessage();
+                            }
+                        }}
                     />
 
 
-                    <button className="bg-black text-white px-6 rounded-lg">
+                    <button
+                        onClick={sendMessage}
+                        className="bg-black text-white px-6 rounded-lg"
+                    >
                         Send
                     </button>
 
